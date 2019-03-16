@@ -14,7 +14,8 @@ def main():
     #inputInf = open_file(args.fileTextName)
     #text = inputInf[0]
     #vocabulary = inputInf[1]
-    text = find_mistakes(text, vocabulary)
+    #text = find_mistakes(text, vocabulary)
+    
     print_result(text)
 
 
