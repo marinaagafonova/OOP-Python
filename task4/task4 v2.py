@@ -87,38 +87,6 @@ def find_mistake(text, vocabulary):
     return text
 
 
-
-
-
-
-
-'''
-def find_words(string, simbols):
-    result = ""
-    for char in string:
-        if char in simbols:
-            result += char
-    return result
-
-
-def char_range(start, end, simbols, step=1):
-    for char in range(ord(start), ord(end), step):
-        simbols.append(chr(char))
-
-
-def removing_of_regular_expressions(string):
-    simbols = []
-    char_range('a', 'z', simbols)
-    char_range('A', 'Z', simbols)
-    char_range('А', 'Я', simbols)
-    char_range('а', 'я', simbols)
-    simbols.append(" ")
-	
-    text = find_words(string, simbols)
-    text = text.split(" ")
-    return text
-'''
-
 def open_file(filename):
     file = ""
     with open(filename) as inf:
@@ -156,34 +124,6 @@ def main():
     #text = find_mistakes(text, vocabulary)
 
     print(text)
-'''
-def print_result(text):
-    for i in range(len(text)):
-        print(text, end=' ')
 
-
-def find_mistakes(text, vocabulary):
-    #mistakes = {} #key is incorrect word, value is correct word
-    count = 0
-    for i in range(len(text)):
-        for j in range(len(vocabulary)):
-            if len(vocabulary[j]) > len(text[i]):
-                continue
-            for k in range(len(vocabulary[j])):
-                if (vocabulary[j][k] != text[i][k]) and (vocabulary[j][k].upper() != text[i][k]):
-                    count += 1
-            if count == 1:
-                correct = ""
-                for k in range(len(vocabulary[j])):
-                    if (vocabulary[j][k] != text[i][k]) and (vocabulary[j][k].upper() != text[i][k]):
-                        correct += vocabulary[j][k]
-                    else:
-                        correct += text[i][k]
-                for k in range(len(vocabulary[j]), len(text[i])):
-                    correct += text[i][k]
-                text[i] = correct
-            count = 0
-    return text
-'''
 
 main()
