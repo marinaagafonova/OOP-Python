@@ -1,5 +1,5 @@
 import argparse
-
+import sys
 
 def choose_root(roots):
     max = len(roots[0])
@@ -92,38 +92,58 @@ def open_file(filename):
     with open(filename) as inf:
         for string in inf:
             file += string
-        #temp = file.split("{")
-        #text = removing_of_regular_expressions(temp[0])
-        #vocabulary = removing_of_regular_expressions(temp[1])
     return file
 
 
+def write_file(filename, text):
+    with open(filename, 'w') as ouf:
+        ouf.truncate(0)
+        ouf.write(text)
+
+
 def parse_input():
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('fileTextName')
     parser.add_argument('fileVocabularyName')
-    #parser.add_argument('--output')
+    parser.add_argument('-o', '--output', type=argparse.FileType('w', encoding='UTF-8'))
     args = parser.parse_args()
+ 
     text = open_file(args.fileTextName)
     vocabulary = open_file(args.fileVocabularyName)
-    #re.split('\s |, ',vocabulary)
     vocabulary = vocabulary.split(",")
-    return [text, vocabulary]
+    if args.output != "":
+        return [text, vocabulary, str(args.output.name)]
+    return[text, vocabulary]
 
+    '''
+    text = ""
+    vocabulary = ""
+    #output = ""
+    n = len(sys.argv)
+    if(n==3 or n==4):
+        text = open_file(sys.argv[1])
+        vocabulary = open_file(sys.argv[2])
+        vocabulary = vocabulary.split(",")
+        if(n==4):
+            output = sys.argv[3]
+            return [text, vocabulary, output]
+        else:
+            return [text, vocabulary]
+    else:
+        raise TypeError("Неверное количество параметров")
+        '''
+    
 
 def main():
     inputInf = parse_input()
     text = find_mistake(inputInf[0], inputInf[1])
-
-    #text = open_file("text.txt")
-    #vocabulary = open_file("vocabulary.txt")
-    
-    #inputInf = open_file(args.fileTextName)
-    #text = inputInf[0]
-    #vocabulary = inputInf[1]
-    #text = find_mistakes(text, vocabulary)
-
-    print(text)
+    if len(inputInf) == 3:
+        output = inputInf[2]
+        write_file(output, text)
+        print("Result is printed in file ", output)
+    else:
+        print(text)    
 
 
 main()
