@@ -112,9 +112,11 @@ def parse_input():
     text = open_file(args.fileTextName)
     vocabulary = open_file(args.fileVocabularyName)
     vocabulary = vocabulary.split(",")
-    if args.output != "":
+    
+    if args.output != None:
         return [text, vocabulary, str(args.output.name)]
     return[text, vocabulary]
+    
 
     '''
     text = ""
