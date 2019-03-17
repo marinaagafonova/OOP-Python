@@ -122,9 +122,8 @@ def open_file(filename):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
-    #args = parser.parse_args()
-    
-    triangles = open_file(".\input.txt")
+    args = parser.parse_args()
+    triangles = open_file(args.filename)
     #triangles = open_file(str(args.filename))
     print("Входные данные: \n")
     for i in triangles:
