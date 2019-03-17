@@ -37,6 +37,7 @@ class MyIterTriangle:
         self.values = array #don't know if it's correct
     
     def __iter__(self):
+        
         return self
 
     def __next__(self):
@@ -83,13 +84,24 @@ class IterTriangles:
         self.end = len(data)
 
     def __iter__(self):
-        return self
+        result = []
+        while True:
+            try:
+                item = next(self)
+                if(item.check_for_correct() and item.check_for_one_quarter()):
+                    result.append(item)
+            except StopIteration:
+                break
+        self.data = result
+        return self.data
 
     def __next__(self):
         if self.index == self.end:
             raise StopIteration
         self.index = self.index + 1
         return self.data[self.index]
+
+
 
 
 def accepts(func):
@@ -127,18 +139,25 @@ def main():
     parser.add_argument('filename')
     args = parser.parse_args()
     triangles = open_file(args.filename)
-    triangles = IterTriangles(triangles)
     print("Входные данные: \n")
-    for i in triangles.data:
+    for i in triangles:
         i.print_triangle()
         print()
     print()
+    triangles = MyIterTriangle(0, len(triangles), triangles)
     print("Results: ")
+    tr = triangles
+    for item in tr:
+        item.print_triangle()
+        print()
+
+    '''
     for i in triangles.data:
         if i.check_for_correct() and i.check_for_one_quarter():
             print("Index of triangle = ", str(triangles.data.index(i)))
             i.print_triangle()
             print()
+            '''
 
 '''
 def open_file(filename):
