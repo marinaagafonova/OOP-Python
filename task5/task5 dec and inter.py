@@ -29,6 +29,23 @@ class Triangle:
         return False
 
 
+class MyIterTriangle:
+    
+    def __init__(self, start, end, array):
+        self.index = start
+        self.end = end
+        self = array #don't know if it's correct
+    
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index >= self.end:
+            raise StopIteration
+        current = self[self.index] #don't know if it's correct
+        self.index += 1
+        return current
+
     def check_for_correct(self):
         nullX = True
         nullY = True
