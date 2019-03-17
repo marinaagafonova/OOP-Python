@@ -74,6 +74,7 @@ class IterTriangles:
                     result.append(item)
             except StopIteration:
                 break
+        print(len(result))
         self.values = result
         return iter(self.values)
 
