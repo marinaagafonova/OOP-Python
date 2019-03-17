@@ -42,7 +42,6 @@ class MyIterTriangle:
     def __next__(self):
         if self.index >= self.end:
             raise StopIteration
-        self.
         current = self.values[self.index] #don't know if it's correct
         self.index += 1
         return current
