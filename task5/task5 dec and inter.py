@@ -17,8 +17,10 @@ class Triangle:
     def print_triangle(self):
         for point in self.points:
             print(point.print_point(), end=";")
+
     def belong_to_line(self, p1, p2, p3):
-        return (p3.x-p1.x)*(p2.y - p1.y) - (p3.y - p1.y)*(p2.x - p1.x)==0 and (p1.x < p3.x < p2.x or p2.x < p3.x <p1.x)
+        return (p3.x-p1.x)*(p2.y - p1.y) - (p3.y - p1.y)*(p2.x - p1.x) == 0 and (p1.x < p3.x < p2.x or p2.x < p3.x < p1.x)
+
     def check_for_line(self):
         if self.belong_to_line(self.points[0], self.points[1], self.points[2]):
             return True
@@ -27,6 +29,33 @@ class Triangle:
         if self.belong_to_line(self.points[0], self.points[2], self.points[1]):
             return True
         return False
+
+    def check_for_correct(self):
+        nullX = True
+        nullY = True
+
+        for i in range(len(self.points)):
+            if (self.points[i].x != 0):
+                nullX = False
+                break
+        for i in range(len(self.points)):
+            if (self.points[i].y != 0):
+                nullY = False
+                break
+        if (nullX or nullY):
+            return False
+
+        if self.check_for_line():
+            return False
+        return True
+
+    def check_for_one_quarter(self):
+        result = False
+        if self.points[0].x * self.points[1].x >= 0 and self.points[0].y * self.points[1].y >= 0:
+            if self.points[1].x * self.points[2].x >= 0 and self.points[1].y * self.points[2].y >= 0:
+                if self.points[0].x * self.points[2].x >= 0 and self.points[0].y * self.points[2].y >= 0:
+                    result = True
+        return result
 
 
 class MyIterTriangle:
@@ -37,7 +66,15 @@ class MyIterTriangle:
         self.values = array #don't know if it's correct
     
     def __iter__(self):
-        
+        result = []
+        while True:
+            try:
+                item = next(self)
+                if(item.check_for_correct() and item.check_for_one_quarter()):
+                    result.append(item)
+            except StopIteration:
+                break
+        self.data = result
         return self
 
     def __next__(self):
@@ -78,10 +115,10 @@ class MyIterTriangle:
 
 class IterTriangles:
 
-    def __init__(self, data):
-        self.data = data
-        self.index = len(data)
-        self.end = len(data)
+    def __init__(self, start, end, array):
+        self.index = start
+        self.end = end
+        self.values = array #do
 
     def __iter__(self):
         result = []
@@ -93,13 +130,16 @@ class IterTriangles:
             except StopIteration:
                 break
         self.data = result
-        return self.data
+        return self
+
+    def res
 
     def __next__(self):
-        if self.index == self.end:
+        if self.index >= self.end:
             raise StopIteration
-        self.index = self.index + 1
-        return self.data[self.index]
+        current = self.values[self.index] #don't know if it's correct
+        self.index += 1
+        return current
 
 
 
@@ -138,15 +178,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
     args = parser.parse_args()
-    triangles = open_file(args.filename)
+    triangles = open_file(str(args.filename))
     print("Входные данные: \n")
     for i in triangles:
         i.print_triangle()
         print()
     print()
-    triangles = MyIterTriangle(0, len(triangles), triangles)
+    triangles = IterTriangles(0, len(triangles), triangles)
     print("Results: ")
-    tr = triangles
+    tr = triangles.data
     for item in tr:
         item.print_triangle()
         print()
