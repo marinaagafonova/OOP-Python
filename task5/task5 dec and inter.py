@@ -58,61 +58,6 @@ class Triangle:
         return result
 
 
-class MyIterTriangle:
-    
-    def __init__(self, start, end, array):
-        self.index = start
-        self.end = end
-        self.values = array #don't know if it's correct
-    
-    def __iter__(self):
-        result = []
-        while True:
-            try:
-                item = next(self)
-                if(item.check_for_correct() and item.check_for_one_quarter()):
-                    result.append(item)
-            except StopIteration:
-                break
-        self.data = result
-        return self
-
-    def __next__(self):
-        if self.index >= self.end:
-            raise StopIteration
-        current = self.values[self.index] #don't know if it's correct
-        self.index += 1
-        return current
-'''
-    def check_for_correct(self):
-        nullX = True
-        nullY = True
-
-        for i in range(len(self.points)):
-            if (self.points[i].x != 0):
-                nullX = False
-                break
-        for i in range(len(self.points)):
-            if (self.points[i].y != 0):
-                nullY = False
-                break
-        if (nullX or nullY):
-            return False
-
-        if self.check_for_line():
-            return False
-        return True
-
-
-    def check_for_one_quarter(self):
-        result = False
-        if (self.points[0].x * self.points[1].x >= 0 and self.points[0].y * self.points[1].y >= 0):
-            if (self.points[1].x * self.points[2].x >= 0 and self.points[1].y * self.points[2].y >= 0):
-                if (self.points[0].x * self.points[2].x >= 0 and self.points[0].y * self.points[2].y >= 0):
-                    result = True
-        return result
-'''
-
 class IterTriangles:
 
     def __init__(self, start, end, array):
@@ -187,35 +132,9 @@ def main():
     print()
     triangles = IterTriangles(0, len(triangles), triangles)
     print("Results: ")
-    tr = triangles
-    for item in tr:
+    #tr = triangles
+    for item in triangles:
         item.print_triangle()
         print()
-
-    '''
-    for i in triangles.data:
-        if i.check_for_correct() and i.check_for_one_quarter():
-            print("Index of triangle = ", str(triangles.data.index(i)))
-            i.print_triangle()
-            print()
-            '''
-
-'''
-def open_file(filename):
-    triangles = []
-    with open(filename) as inf:
-        for string in inf:
-            temp = string.split(';')
-            for i in range(len(temp)):
-                temp[i] = temp[i][1:-1]
-            # print(temp[i])
-            points = []
-            for el in temp:
-                coor = el.split(",")
-                if (len(coor) > 1):
-                    points.append(Point(int(coor[0]), int(coor[1])))
-            triangles.append(Triangle(points))
-    return triangles
-'''
 
 main()
