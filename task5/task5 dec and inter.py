@@ -34,7 +34,7 @@ class MyIterTriangle:
     def __init__(self, start, end, array):
         self.index = start
         self.end = end
-        self = array #don't know if it's correct
+        self.values = array #don't know if it's correct
     
     def __iter__(self):
         return self
@@ -42,10 +42,11 @@ class MyIterTriangle:
     def __next__(self):
         if self.index >= self.end:
             raise StopIteration
-        current = self[self.index] #don't know if it's correct
+        self.
+        current = self.values[self.index] #don't know if it's correct
         self.index += 1
         return current
-
+'''
     def check_for_correct(self):
         nullX = True
         nullY = True
@@ -73,7 +74,7 @@ class MyIterTriangle:
                 if (self.points[0].x * self.points[2].x >= 0 and self.points[0].y * self.points[2].y >= 0):
                     result = True
         return result
-
+'''
 
 class IterTriangles:
 
