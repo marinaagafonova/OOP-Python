@@ -1,4 +1,6 @@
 import argparse
+import re
+
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -73,18 +75,34 @@ class IterTriangles:
         return self.data[self.index]
 
 
-def print_input(func):
-    def wrapped(args):
-        print("Triangles:")
-        func(args)
-    return wrapped
+def accepts(func):
+    def wrapper(arg):
+        print(arg)
+        result = re.match('\w+\.txt$', arg)
+        if result == None:
+            raise TypeError("Неверный формат файла")
+            #return "Неверный формат файла"
+        else:
+            return func(arg)
+    return wrapper
 
 
-@print_input
-def triagles_sout(triangles):
-    for i in triangles:
-        i.print_triangle()
-        print()
+@accepts
+def open_file(filename):
+    triangles = []
+    with open(filename) as inf:
+        for string in inf:
+            temp = string.split(';')
+            for i in range(len(temp)):
+                temp[i] = temp[i][1:-1]
+            # print(temp[i])
+            points = []
+            for el in temp:
+                coor = el.split(",")
+                if len(coor) > 1:
+                    points.append(Point(int(coor[0]), int(coor[1])))
+            triangles.append(Triangle(points))
+    return triangles
 
 
 def main():
@@ -93,7 +111,11 @@ def main():
     args = parser.parse_args()
     triangles = open_file(args.filename)
     triangles = IterTriangles(triangles)
-    triagles_sout(triangles)
+    print("Входные данные: \n")
+    for i in triangles.data:
+        i.print_triangle()
+        print()
+    print()
     print("Results: ")
     for i in triangles.data:
         if i.check_for_correct() and i.check_for_one_quarter():
@@ -101,7 +123,7 @@ def main():
             i.print_triangle()
             print()
 
-
+'''
 def open_file(filename):
     triangles = []
     with open(filename) as inf:
@@ -117,6 +139,6 @@ def open_file(filename):
                     points.append(Point(int(coor[0]), int(coor[1])))
             triangles.append(Triangle(points))
     return triangles
-
+'''
 
 main()
