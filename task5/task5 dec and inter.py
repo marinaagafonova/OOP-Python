@@ -118,7 +118,7 @@ class IterTriangles:
     def __init__(self, start, end, array):
         self.index = start
         self.end = end
-        self.values = array #do
+        self.values = array 
 
     def __iter__(self):
         result = []
@@ -129,15 +129,14 @@ class IterTriangles:
                     result.append(item)
             except StopIteration:
                 break
-        self.data = result
-        return self
+        self.values = result
+        return iter(self.values)
 
-    def res
 
     def __next__(self):
         if self.index >= self.end:
             raise StopIteration
-        current = self.values[self.index] #don't know if it's correct
+        current = self.values[self.index]
         self.index += 1
         return current
 
@@ -147,7 +146,7 @@ class IterTriangles:
 def accepts(func):
     def wrapper(arg):
         print(arg)
-        result = re.match('\w+\.txt$', arg)
+        result = re.match('.+[.]txt$', arg)
         if result == None:
             raise TypeError("Неверный формат файла")
             #return "Неверный формат файла"
@@ -177,8 +176,10 @@ def open_file(filename):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
-    args = parser.parse_args()
-    triangles = open_file(str(args.filename))
+    #args = parser.parse_args()
+    
+    triangles = open_file(".\input.txt")
+    #triangles = open_file(str(args.filename))
     print("Входные данные: \n")
     for i in triangles:
         i.print_triangle()
@@ -186,7 +187,7 @@ def main():
     print()
     triangles = IterTriangles(0, len(triangles), triangles)
     print("Results: ")
-    tr = triangles.data
+    tr = triangles
     for item in tr:
         item.print_triangle()
         print()
