@@ -60,11 +60,13 @@ class Triangle:
 
 class IterTriangles:
 
-    def __init__(self, start, end, array):
-        self.index = start
-        self.end = end
-        self.values = array 
+    def __init__(self, collection):
+        self.cursor = 0
+        self.collection = collection 
 
+    def __iter__(self):
+        return self
+    '''
     def __iter__(self):
         result = []
         while True:
@@ -74,18 +76,35 @@ class IterTriangles:
                     result.append(item)
             except StopIteration:
                 break
-        print(len(result))
+        #print(len(result))
         self.values = result
         return iter(self.values)
-
-
+    '''
+    '''
     def __next__(self):
         if self.index >= self.end:
             raise StopIteration
-        current = self.values[self.index]
-        self.index += 1
-        return current
+        self.cursor += 1
+        return self.values[self.cursor]
+    '''
 
+    def __next__(self):
+        self.cursor += 1
+        if self.cursor >= len(self.collection):
+            raise StopIteration
+        #current = self.collection[self.cursor]
+        while not(self.cursor >= len(self.collection)) and (not(self.collection[self.cursor].check_for_correct() and self.collection[self.cursor].check_for_one_quarter())):
+            self.cursor +=1
+        if (not (self.cursor >= len(self.collection))):
+            return self.collection[self.cursor]
+        else:
+            raise StopIteration
+        '''
+        if :
+            self.collection[self.cursor] = None
+        
+        return self.collection[self.cursor]
+        '''
 
 
 
@@ -120,21 +139,30 @@ def open_file(filename):
 
 
 def main():
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
     args = parser.parse_args()
     triangles = open_file(args.filename)
+    '''
+    triangles = open_file("input.txt")
     #triangles = open_file(str(args.filename))
     print("Входные данные: \n")
     for i in triangles:
         i.print_triangle()
         print()
     print()
-    triangles = IterTriangles(0, len(triangles), triangles)
+    triangles = IterTriangles(triangles, -1)
+    print("Results: ")
+    for item in triangles:
+        item.print_triangle()
+        print()
+    '''
     print("Results: ")
     #tr = triangles
     for item in triangles:
         item.print_triangle()
         print()
+    '''
 
 main()

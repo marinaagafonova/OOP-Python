@@ -147,5 +147,5 @@ def main():
     else:
         print(text)    
 
-
-main()
+if __name__ == "__main__":
+    main()
