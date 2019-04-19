@@ -1,5 +1,3 @@
-import os
-import sys;
 import math;
 
 from MainWindowUI import Ui_MainWindow as MainWindowUI
@@ -16,7 +14,7 @@ from PyQt5 import QtGui;
 from PyQt5.QtWidgets import QApplication, QTableView, QPushButton, QMainWindow, QGridLayout, QWidget, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import QSize, Qt
 
-class MainWindow(QMainWindow, MainWindowUI):
+class MainWindow1(QMainWindow, MainWindowUI):
     # Переопределяем конструктор класса
     def __init__(self):
         # Обязательно нужно вызвать метод супер класса
@@ -33,28 +31,16 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.setCentralWidget(central_widget)  # Устанавливаем центральный виджет
         grid_layout = QGridLayout()  # Создаём QGridLayout
         central_widget.setLayout(grid_layout)  # Устанавливаем данное размещение в центральный виджет
-        self.table = QTableWidget(self)  # Создаём таблицу
-        self.table.setColumnCount(5)  # Устанавливаем три колонки
-        self.table.setRowCount(9)  # и одну строку в таблице
-        # заполняем первую строку
-
-
-        style = ''' 
-        QTableWidget::item {border-style: outset;
-        border-width: 3px; border-radius: 7px; border-color: black}
-        QTableWidget::item:selected { border-width: 5px; border-radius: 7px; border-color: blue
-        }
-        '''
-
-        '''
-        self.table.setItem(0, 0, QTableWidgetItem("Text in column 1"))
-        self.table.setItem(0, 1, QTableWidgetItem("Text in column 2"))
-        self.table.setItem(0, 2, QTableWidgetItem("Text in column 3"))
-        self.table.setItem(1,0, QTableWidgetItem())
-        self.table.item(1,0).setBackground(QtGui.QColor(255,0,0))
-        '''
-        #self.table.setStyleSheet(style)
-        self.init_game_field()
+        self.table = QTableView(self)
+        self.table.setGeometry(30, 30, 580, 660)
+        self.model = QtGui.QStandardItemModel(5, 3, self)
+        self.game = Game(5,9)
+        for i in range(self.game.height):
+            for j in range(self.game.width):
+                self.model.setItem(i, j, QtGui.QStandardItem())
+                color = self.define_color(self.game.matrix[i][j])
+                self.model.item(i, j).setBackground(color)
+        self.table.setModel(self.model)
         grid_layout.addWidget(selectBtn, 0, 0)
         grid_layout.addWidget(restartBtn,1,0)
         grid_layout.addWidget(self.table, 0, 1)  # Добавляем таблицу в сетку
@@ -70,23 +56,20 @@ class MainWindow(QMainWindow, MainWindowUI):
         for i in range(self.game.height):
             for j in range(self.game.width):
                 self.table.setItem(i, j, QTableWidgetItem())
-                color = self.define_color(self.game.matrix[i][j].type_of)
+                color = self.define_color(self.game.matrix[i][j])
                 self.table.item(i, j).setBackground(color)
 
-    def define_color(self, color, selected = False):
-        dif = 60
-        if not(selected):
-            dif = 0
+    def define_color(self, color):
         if color == Color.BLUE:
-            return QtGui.QColor(50, 100, 255-dif)
+            return QtGui.QColor(0,0,255)
         if color == Color.GREEN:
-            return QtGui.QColor(135, 255-dif, 135)
+            return QtGui.QColor(0,255,0)
         if color == Color.RED:
-            return QtGui.QColor(255 - dif, 50, 50)
+            return QtGui.QColor(255,0,0)
         if color == Color.PRINCE:
-            return QtGui.QColor(205, 205, 205)
+            return QtGui.QColor(205,205,205)
         if color == Color.PRINCESS:
-            return QtGui.QColor(235, 155, 235)
+            return QtGui.QColor(235,155,235)
 
     def on_item_clicked(self, e: QModelIndex, me: QMouseEvent = None) -> None:
         if me.button() == Qt.LeftButton:
@@ -94,20 +77,11 @@ class MainWindow(QMainWindow, MainWindowUI):
 
 
     def left_mouse_click(self, row, col) -> None:
-        color = 0
-        if not(self.game.matrix[row][col].selected):
-            #self.table.item(row, col).isSelected = True
-            color = self.define_color(self.game.matrix[row][col].type_of, True)
-            self.game.matrix[row][col].selected = True
-        else:
-            color = self.define_color(self.game.matrix[row][col].type_of)
-            self.game.matrix[row][col].selected = False
-        self.table.item(row, col).setBackground(color)
         if self.previousClick == 0:
             self.previousClick = [int(row), int(col)]
-
+            #self.table.item(row, col).setFocusPolicy(Qt.NoFocus)
         else:
-            if math.fabs(self.previousClick[0] - int(row)) + math.fabs(self.previousClick[1] - int(col)) > 1:
+            if math.fabs(self.previousClick[0] - int(row)) + math.fabs(self.previousClick[1] - int(col)) != 1:
                 self.selected = []
                 raise Exception("Последовательность выделена неверна")
         self.selected.append([row, col])
