@@ -9,11 +9,9 @@ class Color(Enum):
     PRINCE = 5
     EMPTY = 6
 
-
 class Square:
-    def __init__(self, type_of, value = False):
+    def __init__(self, type_of):
         self.type_of = type_of
-        self.selected_v = value
 
     @property
     def type(self):  # Чтение
@@ -23,14 +21,6 @@ class Square:
     def type(self, value):  # Запись
         self.type = value
 
-    @property
-    def selected(self):  # Чтение
-        return self.selected_v
-
-    @selected.setter
-    def selected(self, value):  # Запись
-        self.selected_v = value
-
 
 class Game:
     def __init__(self, width, height):
@@ -38,7 +28,11 @@ class Game:
         self.height = height
         self.matrix = []
         self.create_matrix()
+        self.score = 0
 
+    @property
+    def score_value(self):  # Чтение
+        return self.score
 
     def create_matrix(self):
         for r in range(self.height): #строки
@@ -56,20 +50,41 @@ class Game:
     def move_define_cheak(self):
         prince = 0
         princess = 0
+        selected = 0
         for r in range(self.height):
             for c in range(self.width):
                 if self.matrix[r][c].type_of == Color.EMPTY:
-                    for i in range(r, 1, -1):
-                        self.matrix[i][c] = self.matrix[i-1][c]
-                    self.matrix[0][c] = Color(random.randint(1,3))
+                    selected += 1
+                    for i in range(r, 0, -1):
+                        temp = self.matrix[i-1][c].type_of
+                        self.matrix[i][c].type_of = self.matrix[i-1][c].type_of
+                    color = Color(random.randint(1, 3))
+                    self.matrix[0][c].type_of = color
                 if self.matrix[r][c].type_of == Color.PRINCE:
                     prince = r
                 if self.matrix[r][c].type_of == Color.PRINCESS:
                     princess = r
+        self.refresh_score(selected)
         if princess - prince == 1:
             return True
         else:
             return False
 
+    def refresh_score(self, selected):
+        three = 27
+        increase = 6
+        four = 48
+        dif = four - three
+        value = 0
+        if(selected == 3 or selected == 4):
+            if(selected == 3):
+                self.score += three
+            if(selected == 4):
+                self.score += four
+        else:
+            for i in range(selected - 4):
+                dif += increase
+                value += dif
+            self.score += value
     
 

@@ -13,8 +13,9 @@ from PyQt5.QtCore import QModelIndex, QRectF, Qt
 
 from PyQt5 import QtGui;
 
-from PyQt5.QtWidgets import QApplication, QTableView, QPushButton, QMainWindow, QGridLayout, QWidget, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QLabel, QApplication, QTableView, QPushButton, QMainWindow, QGridLayout, QWidget, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import QSize, Qt
+
 
 class MainWindow(QMainWindow, MainWindowUI):
     # Переопределяем конструктор класса
@@ -24,10 +25,13 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.setMinimumSize(QSize(608, 684))
         self.previousClick = 0
         self.selected = []
+        self.selected_type = -1;
+
         selectBtn = QPushButton('Select', self)
         selectBtn.move(10,10)
         restartBtn = QPushButton('Restart', self)
         restartBtn.move(30, 30)
+        self.gameoverLB = QLabel()
 
         central_widget = QWidget(self)  # Создаём центральный виджет
         self.setCentralWidget(central_widget)  # Устанавливаем центральный виджет
@@ -38,7 +42,7 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.table.setRowCount(9)  # и одну строку в таблице
         # заполняем первую строку
 
-
+        selectBtn.clicked.connect(self.selected_bttn_clicked)
         style = ''' 
         QTableWidget::item {border-style: outset;
         border-width: 3px; border-radius: 7px; border-color: black}
@@ -56,8 +60,10 @@ class MainWindow(QMainWindow, MainWindowUI):
         #self.table.setStyleSheet(style)
         self.init_game_field()
         grid_layout.addWidget(selectBtn, 0, 0)
-        grid_layout.addWidget(restartBtn,1,0)
-        grid_layout.addWidget(self.table, 0, 1)  # Добавляем таблицу в сетку
+        grid_layout.addWidget(restartBtn, 1, 0)
+        grid_layout.addWidget(self.gameoverLB, 2,0)
+        grid_layout.addWidget(self.table, 2, 1)  # Добавляем таблицу в сетку
+
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
             idx = self.table.indexAt(e.pos())
@@ -99,17 +105,42 @@ class MainWindow(QMainWindow, MainWindowUI):
             #self.table.item(row, col).isSelected = True
             color = self.define_color(self.game.matrix[row][col].type_of, True)
             self.game.matrix[row][col].selected = True
-        else:
-            color = self.define_color(self.game.matrix[row][col].type_of)
-            self.game.matrix[row][col].selected = False
-        self.table.item(row, col).setBackground(color)
-        if self.previousClick == 0:
+            if self.previousClick == 0:
+                self.previousClick = [int(row), int(col)]
+                self.selected_type = self.game.matrix[row][col].type_of;
+            else:
+                if self.selected_type != self.game.matrix[row][col].type_of:
+                    raise Exception("Последовательность должна состоять из элементов одинакового типа")
+                if math.fabs(self.previousClick[0] - int(row)) + math.fabs(self.previousClick[1] - int(col)) > 1:
+                    self.selected = []
+                    raise Exception("Последовательность выделена неверна")
+            self.selected.append([row, col])
             self.previousClick = [int(row), int(col)]
 
         else:
-            if math.fabs(self.previousClick[0] - int(row)) + math.fabs(self.previousClick[1] - int(col)) > 1:
-                self.selected = []
-                raise Exception("Последовательность выделена неверна")
-        self.selected.append([row, col])
-        self.previousClick = [int(row), int(col)]
+            color = self.define_color(self.game.matrix[row][col].type_of)
+            self.game.matrix[row][col].selected = False
+            self.selected.remove([row, col])
+            if len(self.selected) == 0:
+                self.selected_type = -1
+                self.previousClick = 0
+        self.table.item(row, col).setBackground(color)
+
+    def redraw(self):
+        for i in range(self.game.height):
+            for j in range(self.game.width):
+                color = self.define_color(self.game.matrix[i][j].type_of)
+                self.table.item(i, j).setBackground(color)
+
+    def selected_bttn_clicked(self):
+        for elem in self.selected:
+            self.game.matrix[elem[0]][elem[1]].type_of = Color.EMPTY
+        endgame = self.game.move_define_cheak()
+        if(endgame):
+            self.gameoverLB.setText("Game is over")
+        self.redraw()
+        self.selected = []
+        self.selected_type = -1
+        self.previousClick = 0
+
 

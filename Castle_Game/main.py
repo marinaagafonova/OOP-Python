@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-from MainWindow import MainWindow
+from MainWindow2 import MainWindow
 
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
