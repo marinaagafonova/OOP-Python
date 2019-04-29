@@ -49,16 +49,51 @@
       <height>601</height>
      </rect>
     </property>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>19</number>
+    <property name="rowCount">
+     <number>9</number>
+    </property>
+    <property name="columnCount">
+     <number>5</number>
+    </property>
+    <attribute name="horizontalHeaderVisible">
+     <bool>false</bool>
     </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>35</number>
+    </attribute>
+    <attribute name="horizontalHeaderHighlightSections">
+     <bool>true</bool>
+    </attribute>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>35</number>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderHighlightSections">
+     <bool>true</bool>
+    </attribute>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <row/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
+    <column/>
    </widget>
    <widget class="QLabel" name="game_is_over">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>100</y>
-      <width>46</width>
+      <width>60</width>
       <height>13</height>
      </rect>
     </property>
@@ -103,6 +138,19 @@
     </property>
     <property name="text">
      <string>Time</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="rulesBttn">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rules</string>
     </property>
    </widget>
   </widget>

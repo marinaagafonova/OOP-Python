@@ -29,6 +29,11 @@ class Game:
         self.matrix = []
         self.create_matrix()
         self.score = 0
+        self.selected = []
+        self.previousClick = None
+        self.selected_type = -1
+        self.game_is_over = False;
+        self.failed = False;
 
     @property
     def score_value(self):  # Чтение
@@ -66,9 +71,9 @@ class Game:
                     princess = r
         self.refresh_score(selected)
         if princess - prince == 1:
-            return True
+            self.game_is_over = True;
         else:
-            return False
+            self.game_is_over = False;
 
     def refresh_score(self, selected):
         three = 27
@@ -86,5 +91,21 @@ class Game:
                 dif += increase
                 value += dif
             self.score += value
-    
+
+    def mark_in_matrix(self):
+        for elem in self.selected:
+            self.matrix[elem[0]][elem[1]].type_of = Color.EMPTY
+        self.selected = []
+        self.selected_type = -1
+        self.previousClick = None
+
+    def calculate_the_time(self, seconds):
+        #1:37
+        limit_time = 97;
+        if limit_time == seconds:
+            self.failed = True;
+            return "0:0"
+        else:
+            result_seconds = limit_time - seconds;
+            return str(result_seconds//60) + ":" + str(result_seconds%60);
 
