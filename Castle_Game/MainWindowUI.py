@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(608, 684)
+        MainWindow.resize(608, 672)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.SelectBttn = QtWidgets.QPushButton(self.centralwidget)
@@ -21,7 +22,7 @@ class Ui_MainWindow(object):
         self.RestartBttn.setGeometry(QtCore.QRect(30, 30, 75, 23))
         self.RestartBttn.setObjectName("RestartBttn")
         self.GameFieldTW = QtWidgets.QTableWidget(self.centralwidget)
-        self.GameFieldTW.setGeometry(QtCore.QRect(130, 20, 451, 601))
+        self.GameFieldTW.setGeometry(QtCore.QRect(130, 20, 461, 611))
         self.GameFieldTW.setRowCount(9)
         self.GameFieldTW.setColumnCount(5)
         self.GameFieldTW.setObjectName("GameFieldTW")
@@ -51,10 +52,19 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 608, 21))
         self.menubar.setObjectName("menubar")
+        self.menuSettings = QtWidgets.QMenu(self.menubar)
+        self.menuSettings.setObjectName("menuSettings")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionSize = QtWidgets.QAction(MainWindow)
+        self.actionSize.setObjectName("actionSize")
+        self.actionHeight = QtWidgets.QAction(MainWindow)
+        self.actionHeight.setObjectName("actionHeight")
+        self.menuSettings.addAction(self.actionSize)
+        self.menuSettings.addAction(self.actionHeight)
+        self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -68,4 +78,8 @@ class Ui_MainWindow(object):
         self.ScoreLb.setText(_translate("MainWindow", "0"))
         self.Lb2.setText(_translate("MainWindow", "Time"))
         self.rulesBttn.setText(_translate("MainWindow", "Rules"))
+        self.menuSettings.setTitle(_translate("MainWindow", "Size"))
+        self.actionSize.setText(_translate("MainWindow", "Width"))
+        self.actionHeight.setText(_translate("MainWindow", "Height"))
+
 

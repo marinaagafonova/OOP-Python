@@ -3,7 +3,7 @@ from Castle2 import *
 from ItemManager import *
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtCore import QModelIndex, Qt, QTimer, QTime
-from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow, QMessageBox, QInputDialog
 from MainWindowUI import Ui_MainWindow as MainWindowUI
 
 class MainWindow(QMainWindow, MainWindowUI):
@@ -15,13 +15,15 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.rulesBttn.clicked.connect(self.show_rules)
         self.GameFieldTW.setColumnCount(5)
         self.GameFieldTW.setRowCount(9)
+        self.actionSize.triggered.connect(self.change_width)
+        self.actionHeight.triggered.connect(self.change_height)
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
             idx = self.GameFieldTW.indexAt(e.pos())
             self.on_item_clicked(idx, e)
         self.GameFieldTW.mousePressEvent = new_mouse_press_event
         self.item_manager = ItemManager()
-        self.init_game_field()
+        self.init_game_field(5, 9)
 
 
 
@@ -32,6 +34,13 @@ class MainWindow(QMainWindow, MainWindowUI):
             self.game_is_over.setText("You failed")
             self.timer.stop()
 
+    def change_height(self):
+        n, ok = QInputDialog.getInt(self, "Height", "Value of height", value=self.game.height, min = 9, max = 20)
+        self.init_game_field(self.game.width, n)
+
+    def change_width(self):
+        n, ok = QInputDialog.getInt(self, "Width", "Value of width", value=self.game.width, min = 5, max = 13)
+        self.init_game_field(n, self.game.height)
 
     def show_rules(self):
         self.timer.stop()
@@ -43,16 +52,18 @@ class MainWindow(QMainWindow, MainWindowUI):
         if reply == QMessageBox.Ok and not(self.game.game_is_over or self.game.failed):
             self.timer.start(1000)
 
-    def init_game_field(self):
+    def init_game_field(self, width, height):
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerEvent)
         self.timer.start(1000)
         self.time = QTime(0, 0, 0)
         self.game_is_over.setText("")
         self.ScoreLb.setText("0")
-        self.game = Game(5, 9)
+        self.game = Game(width, height)
         self.game.define_unworkable_square(0, 3)
-        self.game.define_unworkable_square(4, 3)
+        self.game.define_unworkable_square(width-1, 3)
+        self.GameFieldTW.setColumnCount(width)
+        self.GameFieldTW.setRowCount(height)
         for i in range(self.game.height):
             for j in range(self.game.width):
                 self.GameFieldTW.setItem(i, j, QTableWidgetItem())
@@ -109,5 +120,5 @@ class MainWindow(QMainWindow, MainWindowUI):
 
 
     def restart_bttn_clicked(self):
-        self.init_game_field()
+        self.init_game_field(self.game.width, self.game.height)
 

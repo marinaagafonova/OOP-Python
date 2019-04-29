@@ -44,7 +44,7 @@ class Game:
         for r in range(self.height): #строки
             self.matrix.append([]) # создаем пустую строку
             for c in range(self.width): # в каждой строке - 10 элементов
-                self.matrix[r].append(Square(Color(random.randint(1,3)))) # добавляем очередной элемент в строку
+                self.matrix[r].append(Square(Color(random.randint(1, 3)))) # добавляем очередной элемент в строку
         x = int(random.randint(1, self.width-2))
         self.matrix[int(random.randint(0, 3))][x] = Square(Color.PRINCE)
         self.matrix[int(self.height - 1 - random.randint(0, 3))][x] = Square(Color.PRINCESS)
