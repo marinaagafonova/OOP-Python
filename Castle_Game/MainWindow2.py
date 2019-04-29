@@ -1,12 +1,10 @@
 import math
 from Castle2 import *
 from ItemManager import *
-from PyQt5 import uic, QtGui, QtWidgets
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtCore import QModelIndex, Qt, QTimer, QTime
-from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow
+from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow, QMessageBox
 from MainWindowUI import Ui_MainWindow as MainWindowUI
-#(MainWindowUI, QMainWindow) = uic.loadUiType('MainWindow.ui')
 
 class MainWindow(QMainWindow, MainWindowUI):
     def __init__(self, parent = None):
@@ -14,10 +12,9 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.setupUi(self)
         self.SelectBttn.clicked.connect(self.selected_bttn_clicked)
         self.RestartBttn.clicked.connect(self.restart_bttn_clicked)
+        self.rulesBttn.clicked.connect(self.show_rules)
         self.GameFieldTW.setColumnCount(5)
         self.GameFieldTW.setRowCount(9)
-
-        #C:\Users\maria\Documents\OOP\OOP-Python\Castle_Game\rules.html
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
             idx = self.GameFieldTW.indexAt(e.pos())
@@ -27,12 +24,24 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.init_game_field()
 
 
+
     def timerEvent(self):
         self.time = self.time.addSecs(1)
         self.Lb2.setText(self.game.calculate_the_time(self.time.second() + self.time.minute()*60))
         if self.game.failed:
             self.game_is_over.setText("You failed")
             self.timer.stop()
+
+
+    def show_rules(self):
+        self.timer.stop()
+        data = ""
+        with open("rules.html", 'r', encoding='utf-8') as inf:
+            for string in inf:
+                data += string
+        reply = QMessageBox.information(self, "Rules", data, QMessageBox.Ok);
+        if reply == QMessageBox.Ok and not(self.game.game_is_over or self.game.failed):
+            self.timer.start(1000)
 
     def init_game_field(self):
         self.timer = QTimer()
@@ -42,12 +51,12 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.game_is_over.setText("")
         self.ScoreLb.setText("0")
         self.game = Game(5, 9)
+        self.game.define_unworkable_square(0, 3)
+        self.game.define_unworkable_square(4, 3)
         for i in range(self.game.height):
             for j in range(self.game.width):
                 self.GameFieldTW.setItem(i, j, QTableWidgetItem())
                 type = self.game.matrix[i][j].type_of
-               #color =
-                #text =
                 self.GameFieldTW.item(i, j).setBackground(self.item_manager.define_color(type, False))
                 self.GameFieldTW.item(i, j).setText(self.item_manager.define_text(type))
 
@@ -57,7 +66,7 @@ class MainWindow(QMainWindow, MainWindowUI):
             self.left_mouse_click(e.row(), e.column())
 
     def left_mouse_click(self, row, col) -> None:
-        if not(self.game.game_is_over or self.game.failed):
+        if not(self.game.game_is_over or self.game.failed or self.game.matrix[row][col].type_of == Color.UNWORKABLE):
             if not ((row, col) in self.game.selected):
                 color = self.item_manager.define_color(self.game.matrix[row][col].type_of, True)
                 if self.game.previousClick == None:

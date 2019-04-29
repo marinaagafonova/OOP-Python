@@ -22,6 +22,8 @@ class ItemManager:
             return QtGui.QColor(205, 205, 205)
         if type == Color.PRINCESS:
             return QtGui.QColor(235, 155, 235)
+        if type == Color.UNWORKABLE:
+            return QtGui.QColor(0, 0, 0)
 
     def define_text(self, type):
         if type == Color.PRINCE:

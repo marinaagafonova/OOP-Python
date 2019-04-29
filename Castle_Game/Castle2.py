@@ -2,6 +2,7 @@ from enum import Enum;
 import random;
 
 class Color(Enum):
+    UNWORKABLE = 0
     RED = 1
     GREEN = 2
     BLUE = 3
@@ -44,12 +45,12 @@ class Game:
             self.matrix.append([]) # создаем пустую строку
             for c in range(self.width): # в каждой строке - 10 элементов
                 self.matrix[r].append(Square(Color(random.randint(1,3)))) # добавляем очередной элемент в строку
-        x = int(random.randint(0, self.width-1))
+        x = int(random.randint(1, self.width-2))
         self.matrix[int(random.randint(0, 3))][x] = Square(Color.PRINCE)
         self.matrix[int(self.height - 1 - random.randint(0, 3))][x] = Square(Color.PRINCESS)
 
     def define_unworkable_square(self, x, y):
-        self.matrix[y][x] = -1
+        self.matrix[y][x] = Square(Color.UNWORKABLE)
 
 
     def move_define_cheak(self):
@@ -60,11 +61,15 @@ class Game:
             for c in range(self.width):
                 if self.matrix[r][c].type_of == Color.EMPTY:
                     selected += 1
+                    last = 0;
                     for i in range(r, 0, -1):
+                        if self.matrix[i][c].type_of == Color.UNWORKABLE:
+                            last = i+1;
+                            break;
                         temp = self.matrix[i-1][c].type_of
                         self.matrix[i][c].type_of = self.matrix[i-1][c].type_of
                     color = Color(random.randint(1, 3))
-                    self.matrix[0][c].type_of = color
+                    self.matrix[last][c].type_of = color
                 if self.matrix[r][c].type_of == Color.PRINCE:
                     prince = r
                 if self.matrix[r][c].type_of == Color.PRINCESS:
