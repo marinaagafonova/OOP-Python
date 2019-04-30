@@ -1,4 +1,3 @@
-import math
 from Castle2 import *
 from ItemManager import *
 from PyQt5.QtGui import QMouseEvent
@@ -29,8 +28,9 @@ class MainWindow(QMainWindow, MainWindowUI):
 
     def timerEvent(self):
         self.time = self.time.addSecs(1)
-        self.Lb2.setText(self.game.calculate_the_time(self.time.second() + self.time.minute()*60))
-        if self.game.failed:
+        self.game.refresh_time(self.time.second() + self.time.minute() * 60)
+        self.Lb2.setText(self.game.time_left)
+        if self.game.is_failed:
             self.game_is_over.setText("You failed")
             self.timer.stop()
 
@@ -60,16 +60,15 @@ class MainWindow(QMainWindow, MainWindowUI):
         self.game_is_over.setText("")
         self.ScoreLb.setText("0")
         self.game = Game(width, height)
-        self.game.define_unworkable_square(0, 3)
-        self.game.define_unworkable_square(width-1, 3)
+
         self.GameFieldTW.setColumnCount(width)
         self.GameFieldTW.setRowCount(height)
         for i in range(self.game.height):
             for j in range(self.game.width):
                 self.GameFieldTW.setItem(i, j, QTableWidgetItem())
-                type = self.game.matrix[i][j].type_of
-                self.GameFieldTW.item(i, j).setBackground(self.item_manager.define_color(type, False))
-                self.GameFieldTW.item(i, j).setText(self.item_manager.define_text(type))
+                type = self.game[i, j]
+                self.GameFieldTW.item(i, j).setBackground(ItemManager.define_color(type, False))
+                self.GameFieldTW.item(i, j).setText(ItemManager.define_text(type))
 
 
     def on_item_clicked(self, e: QModelIndex, me: QMouseEvent = None) -> None:
@@ -77,7 +76,8 @@ class MainWindow(QMainWindow, MainWindowUI):
             self.left_mouse_click(e.row(), e.column())
 
     def left_mouse_click(self, row, col) -> None:
-        if not(self.game.game_is_over or self.game.failed or self.game.matrix[row][col].type_of == Color.UNWORKABLE):
+        '''
+        if not(self.game.game_is_over or self.game.failed or self.game.matrix[row][col].type_of == Color.UNWORKABLE or self.game.matrix[row][col].type_of == Color.PRINCE or self.game.matrix[row][col].type_of == Color.PRINCESS):
             if not ((row, col) in self.game.selected):
                 color = self.item_manager.define_color(self.game.matrix[row][col].type_of, True)
                 if self.game.previousClick == None:
@@ -97,22 +97,48 @@ class MainWindow(QMainWindow, MainWindowUI):
                 if len(self.game.selected) == 0:
                     self.game.selected_type = -1
                     self.game.previousClick = None
+        '''
+        try:
+            type, is_selected = self.game.add_new_selected((row, col))
+            color = ItemManager.define_color(type, is_selected)
             self.GameFieldTW.item(row, col).setBackground(color)
+        except SameTypeException:
+            self.timer.stop()
+            reply = QMessageBox.information(self, "Exception", "Последовательность должна состоять из элементов одинакового типа", QMessageBox.Ok);
+            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
+                self.timer.start(1000)
+        except WrongSequenceException:
+            self.timer.stop()
+            reply = QMessageBox.information(self, "Exception", "Последовательность выделена неверно", QMessageBox.Ok);
+            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
+                self.timer.start(1000)
+        except WrongDeletingException:
+            self.timer.stop()
+            reply = QMessageBox.information(self, "Exception", "Удалить можно только последний эллент", QMessageBox.Ok);
+            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
+                self.timer.start(1000)
+        except WrongTypeException:
+            self.timer.stop()
+            reply = QMessageBox.information(self, "Exception", "Выделен элемент, который по правилам нельзя выделять", QMessageBox.Ok);
+            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
+                self.timer.start(1000)
+
+
 
     def redraw(self):
         for i in range(self.game.height):
             for j in range(self.game.width):
-                type = self.game.matrix[i][j].type_of
-                color = self.item_manager.define_color(type, False)
-                text = self.item_manager.define_text(type)
+                type = self.game[i, j]
+                color = ItemManager.define_color(type, False)
+                text = ItemManager.define_text(type)
                 self.GameFieldTW.item(i, j).setBackground(color)
                 self.GameFieldTW.item(i, j).setText(text)
 
     def selected_bttn_clicked(self):
-        if not(self.game.game_is_over):
+        if self.game.deleting_allselected_is_possible():
             self.game.mark_in_matrix()
             self.game.move_define_cheak()
-            if (self.game.game_is_over):
+            if (self.game.gameIsover):
                 self.game_is_over.setText("Game is over")
                 self.timer.stop()
             self.redraw()

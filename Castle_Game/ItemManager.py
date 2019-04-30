@@ -8,7 +8,8 @@ class ItemManager:
         self.type = -1;
         self.text = ""
 
-    def define_color(self, type, selected):
+    @staticmethod
+    def define_color(type, selected):
         dif = 60
         if not (selected):
             dif = 0
@@ -25,7 +26,8 @@ class ItemManager:
         if type == Color.UNWORKABLE:
             return QtGui.QColor(0, 0, 0)
 
-    def define_text(self, type):
+    @staticmethod
+    def define_text(type):
         if type == Color.PRINCE:
             return "Prince"
         elif type == Color.PRINCESS:
