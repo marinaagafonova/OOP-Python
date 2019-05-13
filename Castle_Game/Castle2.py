@@ -75,10 +75,6 @@ class Game:
         return self.__game_is_over
 
     @property
-    def gameIsover(self):  # Чтение
-        return self.__game_is_over
-
-    @property
     def width(self):  # Чтение
         return self.__width
 
@@ -101,9 +97,18 @@ class Game:
         self.__matrix[y][x] = Square(Color.UNWORKABLE)
 
 
-    def move_define_cheak(self):
+    def __check_if_game_is_over(self):
         prince = 0
         princess = 0
+        for r in range(self.height):
+            for c in range(self.width):
+                if self.__matrix[r][c].type == Color.PRINCE:
+                    prince = r
+                if self.__matrix[r][c].type == Color.PRINCESS:
+                    princess = r
+        self.__game_is_over = princess - prince == 1
+
+    def move_define_cheak(self):
         selected = 0
         for r in range(self.height):
             for c in range(self.width):
@@ -118,15 +123,9 @@ class Game:
                         self.__matrix[i][c].type = self.__matrix[i-1][c].type
                     color = Color(random.randint(1, 3))
                     self.__matrix[last][c].type = color
-                if self.__matrix[r][c].type == Color.PRINCE:
-                    prince = r
-                if self.__matrix[r][c].type == Color.PRINCESS:
-                    princess = r
         self.__refresh_score(selected)
-        if princess - prince == 1:
-            self.__game_is_over = True;
-        else:
-            self.__game_is_over = False;
+        self.__check_if_game_is_over()
+
 
     def __refresh_score(self, selected):
         three = 27
@@ -180,6 +179,10 @@ class Game:
                     if len(self.__selected) == 0:
                         self.__selected_type = -1
                         self.__previousClick = None
+                    else:
+                        last = self.__selected[len(self.__selected)-1]
+                        self.__selected_type = self.__matrix[last[0]][last[1]].type
+                        self.__previousClick = (last[0], last[1])
                     return (self.__matrix[i][j].type, False)
                 else:
                     raise WrongDeletingException(Exception)
@@ -201,8 +204,8 @@ class Game:
         #1:37
         limit_time = 97;
         if limit_time == seconds:
-            self.failed = True;
-            return "0:0"
+            self.__failed = True;
+            self.__time_left = "0:0"
         else:
             result_seconds = limit_time - seconds;
             self.__time_left = str(result_seconds//60) + ":" + str(result_seconds%60)

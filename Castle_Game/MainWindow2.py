@@ -21,7 +21,6 @@ class MainWindow(QMainWindow, MainWindowUI):
             idx = self.GameFieldTW.indexAt(e.pos())
             self.on_item_clicked(idx, e)
         self.GameFieldTW.mousePressEvent = new_mouse_press_event
-        self.item_manager = ItemManager()
         self.init_game_field(5, 9)
 
 
@@ -49,7 +48,7 @@ class MainWindow(QMainWindow, MainWindowUI):
             for string in inf:
                 data += string
         reply = QMessageBox.information(self, "Rules", data, QMessageBox.Ok);
-        if reply == QMessageBox.Ok and not(self.game.game_is_over or self.game.failed):
+        if reply == QMessageBox.Ok and not(self.game.gameIsover or self.game.is_failed):
             self.timer.start(1000)
 
     def init_game_field(self, width, height):
@@ -76,54 +75,18 @@ class MainWindow(QMainWindow, MainWindowUI):
             self.left_mouse_click(e.row(), e.column())
 
     def left_mouse_click(self, row, col) -> None:
-        '''
-        if not(self.game.game_is_over or self.game.failed or self.game.matrix[row][col].type_of == Color.UNWORKABLE or self.game.matrix[row][col].type_of == Color.PRINCE or self.game.matrix[row][col].type_of == Color.PRINCESS):
-            if not ((row, col) in self.game.selected):
-                color = self.item_manager.define_color(self.game.matrix[row][col].type_of, True)
-                if self.game.previousClick == None:
-                    self.game.previousClick = ((row), int(col))
-                    self.game.selected_type = self.game.matrix[row][col].type_of;
-                else:
-                    if self.game.selected_type != self.game.matrix[row][col].type_of:
-                        raise Exception("Последовательность должна состоять из элементов одинакового типа")
-                    if math.fabs(self.game.previousClick[0] - row) + math.fabs(self.game.previousClick[1] - int(col)) > 1:
-                        raise Exception("Последовательность выделена неверна")
-                self.game.selected.append((row, col))
-                self.game.previousClick = (row, col)
-
-            else:
-                color = self.item_manager.define_color(self.game.matrix[row][col].type_of, False)
-                self.game.selected.remove((row, col))
-                if len(self.game.selected) == 0:
-                    self.game.selected_type = -1
-                    self.game.previousClick = None
-        '''
         try:
             type, is_selected = self.game.add_new_selected((row, col))
             color = ItemManager.define_color(type, is_selected)
             self.GameFieldTW.item(row, col).setBackground(color)
         except SameTypeException:
-            self.timer.stop()
-            reply = QMessageBox.information(self, "Exception", "Последовательность должна состоять из элементов одинакового типа", QMessageBox.Ok);
-            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
-                self.timer.start(1000)
+            QMessageBox.information(self, "Exception", "Последовательность должна состоять из элементов одинакового типа", QMessageBox.Ok);
         except WrongSequenceException:
-            self.timer.stop()
-            reply = QMessageBox.information(self, "Exception", "Последовательность выделена неверно", QMessageBox.Ok);
-            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
-                self.timer.start(1000)
+            QMessageBox.information(self, "Exception", "Последовательность выделена неверно", QMessageBox.Ok);
         except WrongDeletingException:
-            self.timer.stop()
-            reply = QMessageBox.information(self, "Exception", "Удалить можно только последний эллент", QMessageBox.Ok);
-            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
-                self.timer.start(1000)
+            QMessageBox.information(self, "Exception", "Удалить можно только последний эллент", QMessageBox.Ok);
         except WrongTypeException:
-            self.timer.stop()
-            reply = QMessageBox.information(self, "Exception", "Выделен элемент, который по правилам нельзя выделять", QMessageBox.Ok);
-            if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
-                self.timer.start(1000)
-
-
+            QMessageBox.information(self, "Exception", "Выделен элемент, который по правилам нельзя выделять", QMessageBox.Ok);
 
     def redraw(self):
         for i in range(self.game.height):
