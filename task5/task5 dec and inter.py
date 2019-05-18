@@ -67,7 +67,7 @@ class IterTriangles:
     def __iter__(self):
         return self
     '''
-    def __iter__(self):
+>    def __iter__(self):>
         result = []
         while True:
             try:
@@ -139,30 +139,22 @@ def open_file(filename):
 
 
 def main():
-    '''
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('filename')
     args = parser.parse_args()
     triangles = open_file(args.filename)
-    '''
-    triangles = open_file("input.txt")
-    #triangles = open_file(str(args.filename))
+    triangles = open_file(str(args.filename))
     print("Входные данные: \n")
     for i in triangles:
         i.print_triangle()
         print()
     print()
-    triangles = IterTriangles(triangles, -1)
+    triangles = IterTriangles(triangles)
     print("Results: ")
     for item in triangles:
         item.print_triangle()
         print()
-    '''
-    print("Results: ")
-    #tr = triangles
-    for item in triangles:
-        item.print_triangle()
-        print()
-    '''
+    
 
 main()
