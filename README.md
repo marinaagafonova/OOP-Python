@@ -54,3 +54,6 @@
 Обязательным является использование @property, @staticmethod/@classmethod (в
 данной задаче, вероятно, все же @staticmethod).
 13. http://igroflot.ru/logic/flash_game_2993/
+## task_7_blog
+13. Блог с использованием Markup-разметки (поддержка основных html-тэгов).
+Делать все на flask (но допускаются и другие web-фрейморки).
