@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 from datetime import datetime
 from postForm import PostForm
-
+from tagfilter import Filter
+ 
 
 app = Flask(__name__)
 
@@ -32,6 +33,7 @@ def index():
 @app.route('/post/<int:post_id>')
 def post(post_id):
     post = Blogpost.query.filter_by(id=post_id).one()
+    post.content = Filter.filter_tags(post.content)
     return render_template('post.html', post=post)
 
 
