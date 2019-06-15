@@ -1,149 +1,112 @@
-import math;
 from Castle2 import *
 from ItemManager import *
 from PyQt5 import uic, QtGui, QtWidgets
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtCore import QModelIndex, Qt, QTimer, QTime
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow, QMessageBox, QInputDialog
+from MainWindowUI import Ui_MainWindow as MainWindowUI
 
-(MainWindowUI, QMainWindow) = uic.loadUiType('MainWindow.ui')
 
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        self.ui = MainWindowUI()
-        self.ui.setupUi(self)
-        self.ui.SelectBttn.clicked.connect(self.selected_bttn_clicked)
-        self.ui.RestartBttn.clicked.connect(self.restart_bttn_clicked)
-        self.ui.GameFieldTW.setColumnCount(5)
-        self.ui.GameFieldTW.setRowCount(9)
-        self.ui.GameFieldTW.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.ui.GameFieldTW.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        self.ui.GameFieldTW.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
-        self.ui.GameFieldTW.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch)
-        self.ui.GameFieldTW.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.Stretch)
-
+class MainWindow(QMainWindow, MainWindowUI):
+    def __init__(self, parent = None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.SelectBttn.clicked.connect(self.selected_bttn_clicked)
+        self.RestartBttn.clicked.connect(self.restart_bttn_clicked)
+        self.rulesBttn.clicked.connect(self.show_rules)
+        self.GameFieldTW.setColumnCount(5)
+        self.GameFieldTW.setRowCount(9)
+        self.actionSize.triggered.connect(self.change_width)
+        self.actionHeight.triggered.connect(self.change_height)
 
         def new_mouse_press_event(e: QMouseEvent) -> None:
-            idx = self.ui.GameFieldTW.indexAt(e.pos())
+            idx = self.GameFieldTW.indexAt(e.pos())
             self.on_item_clicked(idx, e)
-        self.ui.GameFieldTW.mousePressEvent = new_mouse_press_event
-        self.init_game_field()
-        self.timer = QTimer()
-        self.time = QTime(0, 0, 0)
-        self.endtime = QTime(0, 1, 37)
-        self.timer.timeout.connect(self.timerEvent)
-        self.timer.start(1000)
 
-        #self.timer.timeout.connect(self.time)
-
-
+        self.GameFieldTW.mousePressEvent = new_mouse_press_event
+        self.init_game_field(5, 9)
 
     def timerEvent(self):
         self.time = self.time.addSecs(1)
-        if self.endtime.minute()!=0 and self.time.second() >= 37:
-            self.endtime = QTime(0, 0, 60)
-            self.time = QTime(0, 0, 0)
-        self.ui.Lb2.setText(str(self.endtime.minute()) + ":" + str(self.endtime.second() - self.time.second()%60))
-        if self.ui.Lb2.text() == "0:0":
-            self.ui.game_is_over.setText("Game is over")
+        self.game.refresh_time(self.time.second() + self.time.minute() * 60)
+        self.Lb2.setText(self.game.time_left)
+        if self.game.is_failed:
+            self.game_is_over.setText("You failed")
             self.timer.stop()
 
-    def init_game_field(self):
+    def change_height(self):
+        n, ok = QInputDialog.getInt(self, "Height", "Value of height", value=self.game.height, min=9, max=20)
+        self.init_game_field(self.game.width, n)
+
+    def change_width(self):
+        n, ok = QInputDialog.getInt(self, "Width", "Value of width", value=self.game.width, min=5, max=13)
+        self.init_game_field(n, self.game.height)
+
+    def show_rules(self):
+        self.timer.stop()
+        data = ""
+        with open("rules.html", 'r', encoding='utf-8') as inf:
+            for string in inf:
+                data += string
+        reply = QMessageBox.information(self, "Rules", data, QMessageBox.Ok);
+        if reply == QMessageBox.Ok and not (self.game.gameIsover or self.game.is_failed):
+            self.timer.start(1000)
+
+    def init_game_field(self, width, height):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timerEvent)
+        self.timer.start(1000)
         self.time = QTime(0, 0, 0)
-        #self.timer.start(1000)
-        self.previousClick = 0
-        self.selected = []
-        self.selected_type = -1
-        self.ui.game_is_over.setText("")
-        self.ui.ScoreLb.setText("0")
-        self.game = Game(5, 9)
+        self.game_is_over.setText("")
+        self.ScoreLb.setText("0")
+        self.game = Game(width, height)
+        self.GameFieldTW.setColumnCount(width)
+        self.GameFieldTW.setRowCount(height)
+
         for i in range(self.game.height):
             for j in range(self.game.width):
-                self.ui.GameFieldTW.setItem(i, j, QTableWidgetItem())
-                if self.game.matrix[i][j].type_of == Color.PRINCE:
-                    self.ui.GameFieldTW.item(i, j).setText("Prince")
-                if self.game.matrix[i][j].type_of == Color.PRINCESS:
-                    self.ui.GameFieldTW.item(i, j).setText("Princess")
-                color = self.define_color(self.game.matrix[i][j].type_of)
-                self.ui.GameFieldTW.item(i, j).setBackground(color)
-
-    def define_color(self, color, selected=False):
-        dif = 60
-        if not (selected):
-            dif = 0
-        if color == Color.BLUE:
-            return QtGui.QColor(65, 105, 255 - dif)
-        if color == Color.GREEN:
-            return QtGui.QColor(152, 251 - dif, 152)
-        if color == Color.RED:
-            return QtGui.QColor(178 - dif, 34, 34)
-        if color == Color.PRINCE:
-            return QtGui.QColor(205, 205, 205)
-        if color == Color.PRINCESS:
-            return QtGui.QColor(235, 155, 235)
+                self.GameFieldTW.setItem(i, j, QTableWidgetItem())
+                type = self.game[i, j]
+                self.GameFieldTW.item(i, j).setBackground(ItemManager.define_color(type, False))
+                self.GameFieldTW.item(i, j).setText(ItemManager.define_text(type))
 
     def on_item_clicked(self, e: QModelIndex, me: QMouseEvent = None) -> None:
         if me.button() == Qt.LeftButton:
             self.left_mouse_click(e.row(), e.column())
 
     def left_mouse_click(self, row, col) -> None:
-        if self.ui.game_is_over.text() != "Game is over":
-            color = 0
-            if not ([row, col] in self.selected):
-                # self.table.item(row, col).isSelected = True
-                color = self.define_color(self.game.matrix[row][col].type_of, True)
-                if self.previousClick == 0:
-                    self.previousClick = [int(row), int(col)]
-                    self.selected_type = self.game.matrix[row][col].type_of;
-                else:
-                    if self.selected_type != self.game.matrix[row][col].type_of:
-                        raise Exception("Последовательность должна состоять из элементов одинакового типа")
-                    if math.fabs(self.previousClick[0] - int(row)) + math.fabs(self.previousClick[1] - int(col)) > 1:
-                        self.selected = []
-                        raise Exception("Последовательность выделена неверна")
-                self.selected.append([row, col])
-                self.previousClick = [int(row), int(col)]
-
-            else:
-                color = self.define_color(self.game.matrix[row][col].type_of)
-                self.selected.remove([row, col])
-                if len(self.selected) == 0:
-                    self.selected_type = -1
-                    self.previousClick = 0
-            self.ui.GameFieldTW.item(row, col).setBackground(color)
+        try:
+            type, is_selected = self.game.add_new_selected((row, col))
+            color = ItemManager.define_color(type, is_selected)
+            self.GameFieldTW.item(row, col).setBackground(color)
+        except SameTypeException:
+            QMessageBox.information(self, "Exception", "Последовательность должна состоять из элементов одинакового типа", QMessageBox.Ok);
+        except WrongSequenceException:
+            QMessageBox.information(self, "Exception", "Последовательность выделена неверно", QMessageBox.Ok);
+        except WrongDeletingException:
+            QMessageBox.information(self, "Exception", "Удалить можно только последний эллент", QMessageBox.Ok);
+        except WrongTypeException:
+            QMessageBox.information(self, "Exception", "Выделен элемент, который по правилам нельзя выделять", QMessageBox.Ok);
 
     def redraw(self):
         for i in range(self.game.height):
             for j in range(self.game.width):
-                type = self.game.matrix[i][j].type_of
-                color = self.define_color(type)
-                self.ui.GameFieldTW.item(i, j).setBackground(color)
-                if(type == Color.PRINCE or type == Color.PRINCESS):
-                    if type == Color.PRINCE:
-                        self.ui.GameFieldTW.item(i, j).setText("Prince")
-                    if type == Color.PRINCESS:
-                        self.ui.GameFieldTW.item(i, j).setText("Princess")
-                else:
-                    self.ui.GameFieldTW.item(i, j).setText("")
+                type = self.game[i, j]
+                color = ItemManager.define_color(type, False)
+                text = ItemManager.define_text(type)
+                self.GameFieldTW.item(i, j).setBackground(color)
+                self.GameFieldTW.item(i, j).setText(text)
 
     def selected_bttn_clicked(self):
-        if self.ui.game_is_over.text() != "Game is over":
-            self.mark_in_matrix()
-            endgame = self.game.move_define_cheak()
-            if (endgame):
-                self.ui.game_is_over.setText("Game is over")
+        if self.game.deleting_allselected_is_possible():
+            self.game.mark_in_matrix()
+            self.game.move_define_cheak()
+            if (self.game.gameIsover):
+                self.game_is_over.setText("Game is over")
                 self.timer.stop()
             self.redraw()
-            self.ui.ScoreLb.setText(str(self.game.score_value))
-
-    def mark_in_matrix(self):
-        for elem in self.selected:
-            self.game.matrix[elem[0]][elem[1]].type_of = Color.EMPTY
-        self.selected = []
-        self.selected_type = -1
-        self.previousClick = 0
+            self.ScoreLb.setText(str(self.game.score_value))
 
     def restart_bttn_clicked(self):
-        self.init_game_field()
+        self.init_game_field(self.game.width, self.game.height)
 
