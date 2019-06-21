@@ -25,6 +25,7 @@ class MainWindow(QMainWindow, MainWindowUI):
 
         self.GameFieldTW.mousePressEvent = new_mouse_press_event
         self.init_game_field(5, 9)
+        self.resizeColumn()
 
     def timerEvent(self):
         self.time = self.time.addSecs(1)
@@ -33,6 +34,14 @@ class MainWindow(QMainWindow, MainWindowUI):
         if self.game.is_failed:
             self.game_is_over.setText("You failed")
             self.timer.stop()
+
+    def resizeColumn(self):
+        header = self.GameFieldTW.horizontalHeader()
+        row = self.GameFieldTW.verticalHeader()
+        for i in range(self.game.width):
+            header.setSectionResizeMode(i, QtWidgets.QHeaderView.Stretch)
+        for j in range(self.game.height):
+            row.setSectionResizeMode(j, QtWidgets.QHeaderView.Stretch)
 
     def change_height(self):
         n, ok = QInputDialog.getInt(self, "Height", "Value of height", value=self.game.height, min=9, max=20)
