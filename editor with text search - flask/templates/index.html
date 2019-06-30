@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Editor</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="{{ url_for('static', filename='font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='clean-blog.min.css') }}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+
+    <!-- Page Header -->
+    <header class="masthead">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="site-heading">
+              <h1>Редактор</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search form -->
+    <form method="POST" class="form-inline mr-auto" >
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="key">
+      <input  class="btn btn-unique btn-rounded btn-sm my-0" type="submit" name="submit" value="Search">
+    </form>
+
+    <!-- LoadFile form -->
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="data_file">
+      <input  class="btn btn-unique btn-rounded btn-sm my-0" type="submit" name="submit" value="Load">
+    </form>
+
+    <!-- Main Content -->
+    <article>
+        <form method="POST" action="">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+              <p rows="5" class="form-control" placeholder="Blog content" name="content" id="content" required data-validation-required-message="Please enter a message.">  {{text|safe}} </p>
+              <input  class="btn btn-unique btn-rounded btn-sm my-0" type="submit" name="submit" value="Edit">
+          </div>
+      </div>
+      </form>
+    </article>
+
+    <hr>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="{{ url_for('static', filename='clean-blog.min.js') }}"></script>
+
+  </body>
+
+</html>
